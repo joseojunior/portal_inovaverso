@@ -1,0 +1,2 @@
+ALTER TABLE "Author"
+ADD COLUMN IF NOT EXISTS "socialLinks" JSONB;

@@ -1,0 +1,603 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum AdminRole {
+  SUPER_ADMIN
+  ADMIN
+  EDITOR
+  MODERATOR
+}
+
+enum NewsStatus {
+  DRAFT
+  DRAFT_AI
+  PENDING_REVIEW
+  APPROVED
+  SCHEDULED
+  PUBLISHED
+  REJECTED
+  ARCHIVED
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+}
+
+enum MediaStatus {
+  PENDING_REVIEW
+  APPROVED
+  REJECTED
+}
+
+enum CommentStatus {
+  PENDING
+  APPROVED
+  HIDDEN
+  SPAM
+  DELETED
+}
+
+enum AuditEntityType {
+  USER
+  ADMIN_USER
+  AUTHOR
+  CATEGORY
+  TAG
+  COUNTRY
+  STATE
+  CITY
+  NEWS
+  MEDIA_FILE
+  COMMENT
+  AI_SEARCH_CONFIG
+  AI_JOB
+  AI_DRAFT
+  PUBLICATION_HISTORY
+}
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  APPROVE
+  REJECT
+  PUBLISH
+  UNPUBLISH
+  ARCHIVE
+  LOGIN
+  LOGOUT
+  RUN
+}
+
+enum AIJobStatus {
+  QUEUED
+  RUNNING
+  SUCCEEDED
+  FAILED
+  CANCELED
+}
+
+enum AIDraftStatus {
+  GENERATED
+  PENDING_REVIEW
+  APPROVED
+  REJECTED
+  ARCHIVED
+}
+
+model User {
+  id              String    @id @default(cuid())
+  email           String    @unique
+  name            String?
+  slug            String?   @unique
+  passwordHash    String?
+  avatarUrl       String?
+  isActive        Boolean   @default(true)
+  emailVerifiedAt DateTime?
+  lastLoginAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  comments        Comment[]
+
+  @@index([isActive])
+  @@index([createdAt])
+}
+
+model AdminUser {
+  id                   String               @id @default(cuid())
+  email                String               @unique
+  name                 String
+  passwordHash         String
+  avatarUrl            String?
+  role                 AdminRole
+  isActive             Boolean              @default(true)
+  lastLoginAt          DateTime?
+  createdAt            DateTime             @default(now())
+  updatedAt            DateTime             @updatedAt
+  linkedAuthor         Author?
+  createdNews          News[]               @relation("NewsCreatedByAdmin")
+  updatedNews          News[]               @relation("NewsUpdatedByAdmin")
+  reviewedNews         News[]               @relation("NewsReviewedByAdmin")
+  publishedNews        News[]               @relation("NewsPublishedByAdmin")
+  approvedComments     Comment[]            @relation("CommentApprovedByAdmin")
+  rejectedComments     Comment[]            @relation("CommentRejectedByAdmin")
+  uploadedMediaFiles   MediaFile[]          @relation("MediaUploadedByAdmin")
+  approvedMediaFiles   MediaFile[]          @relation("MediaApprovedByAdmin")
+  createdAiConfigs     AISearchConfig[]     @relation("AISearchConfigCreatedByAdmin")
+  updatedAiConfigs     AISearchConfig[]     @relation("AISearchConfigUpdatedByAdmin")
+  createdAiJobs        AIJob[]              @relation("AIJobCreatedByAdmin")
+  startedAiJobs        AIJob[]              @relation("AIJobStartedByAdmin")
+  completedAiJobs      AIJob[]              @relation("AIJobCompletedByAdmin")
+  approvedAiDrafts     AIDraft[]            @relation("AIDraftApprovedByAdmin")
+  rejectedAiDrafts     AIDraft[]            @relation("AIDraftRejectedByAdmin")
+  selectedAiSuggestions AIDraftMediaSuggestion[] @relation("AIDraftMediaSuggestionSelectedByAdmin")
+  auditLogs            AuditLog[]
+  publicationHistory   PublicationHistory[]
+
+  @@index([role, isActive])
+  @@index([createdAt])
+}
+
+model Author {
+  id             String    @id @default(cuid())
+  adminUserId    String?   @unique
+  name           String
+  slug           String    @unique
+  email          String?   @unique
+  avatarUrl      String?
+  bio            String?
+  socialLinks    Json?
+  isActive       Boolean   @default(true)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  adminUser      AdminUser? @relation(fields: [adminUserId], references: [id], onDelete: SetNull)
+  news           News[]
+  aiDrafts       AIDraft[]
+
+  @@index([isActive])
+  @@index([name])
+}
+
+model Category {
+  id                String      @id @default(cuid())
+  parentId          String?
+  name              String
+  slug              String      @unique
+  description       String?
+  seoTitle          String?
+  seoDescription    String?
+  isActive          Boolean     @default(true)
+  sortOrder         Int         @default(0)
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  parent            Category?   @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  children          Category[]  @relation("CategoryHierarchy")
+  news              News[]
+  aiSearchConfigs   AISearchConfig[]
+  aiDrafts          AIDraft[]
+
+  @@index([parentId])
+  @@index([isActive, sortOrder])
+}
+
+model Tag {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  description String?
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  newsTags    NewsTag[]
+
+  @@index([isActive])
+  @@index([name])
+}
+
+model Country {
+  id              String           @id @default(cuid())
+  name            String
+  slug            String           @unique
+  isoCode2        String           @unique @db.VarChar(2)
+  isoCode3        String?          @unique @db.VarChar(3)
+  phoneCode       String?
+  isActive        Boolean          @default(true)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  states          State[]
+  cities          City[]
+  news            News[]
+  aiSearchConfigs AISearchConfig[]
+  aiDrafts        AIDraft[]
+
+  @@index([isActive])
+  @@index([name])
+}
+
+model State {
+  id              String           @id @default(cuid())
+  countryId       String
+  name            String
+  slug            String
+  code            String
+  isActive        Boolean          @default(true)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  country         Country          @relation(fields: [countryId], references: [id], onDelete: Restrict)
+  cities          City[]
+  news            News[]
+  aiSearchConfigs AISearchConfig[]
+  aiDrafts        AIDraft[]
+
+  @@unique([countryId, slug])
+  @@unique([countryId, code])
+  @@index([countryId, isActive])
+  @@index([name])
+}
+
+model City {
+  id              String           @id @default(cuid())
+  countryId       String
+  stateId         String
+  name            String
+  slug            String
+  isCapital       Boolean          @default(false)
+  isActive        Boolean          @default(true)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  country         Country          @relation(fields: [countryId], references: [id], onDelete: Restrict)
+  state           State            @relation(fields: [stateId], references: [id], onDelete: Restrict)
+  news            News[]
+  aiSearchConfigs AISearchConfig[]
+  aiDrafts        AIDraft[]
+
+  @@unique([stateId, slug])
+  @@index([countryId, stateId, isActive])
+  @@index([name])
+}
+
+model News {
+  id                String               @id @default(cuid())
+  categoryId        String
+  authorId          String
+  countryId         String?
+  stateId           String?
+  cityId            String?
+  featuredMediaId   String?
+  createdByAdminId  String
+  updatedByAdminId  String?
+  reviewedByAdminId String?
+  publishedByAdminId String?
+  title             String
+  subtitle          String?
+  slug              String               @unique
+  summary           String?
+  content           String?
+  status            NewsStatus           @default(DRAFT)
+  isAiAssisted      Boolean              @default(false)
+  commentsEnabled   Boolean              @default(false)
+  seoTitle          String?
+  seoDescription    String?
+  seoCanonicalUrl   String?
+  submittedAt       DateTime?
+  reviewedAt        DateTime?
+  scheduledAt       DateTime?
+  publishedAt       DateTime?
+  archivedAt        DateTime?
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
+  category          Category             @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  author            Author               @relation(fields: [authorId], references: [id], onDelete: Restrict)
+  country           Country?             @relation(fields: [countryId], references: [id], onDelete: SetNull)
+  state             State?               @relation(fields: [stateId], references: [id], onDelete: SetNull)
+  city              City?                @relation(fields: [cityId], references: [id], onDelete: SetNull)
+  featuredMedia     MediaFile?           @relation("NewsFeaturedMedia", fields: [featuredMediaId], references: [id], onDelete: SetNull)
+  createdByAdmin    AdminUser            @relation("NewsCreatedByAdmin", fields: [createdByAdminId], references: [id], onDelete: Restrict)
+  updatedByAdmin    AdminUser?           @relation("NewsUpdatedByAdmin", fields: [updatedByAdminId], references: [id], onDelete: SetNull)
+  reviewedByAdmin   AdminUser?           @relation("NewsReviewedByAdmin", fields: [reviewedByAdminId], references: [id], onDelete: SetNull)
+  publishedByAdmin  AdminUser?           @relation("NewsPublishedByAdmin", fields: [publishedByAdminId], references: [id], onDelete: SetNull)
+  newsTags          NewsTag[]
+  mediaRelations    NewsMedia[]
+  sources           NewsSource[]
+  comments          Comment[]
+  aiJobs            AIJob[]
+  aiDrafts          AIDraft[]
+  publicationHistory PublicationHistory[]
+
+  @@index([categoryId, status])
+  @@index([authorId, status])
+  @@index([countryId, stateId, cityId])
+  @@index([status, publishedAt])
+  @@index([scheduledAt])
+  @@index([createdByAdminId])
+}
+
+model NewsTag {
+  newsId     String
+  tagId      String
+  assignedAt DateTime @default(now())
+  news       News     @relation(fields: [newsId], references: [id], onDelete: Cascade)
+  tag        Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([newsId, tagId])
+  @@index([tagId, assignedAt])
+}
+
+model MediaFile {
+  id                String       @id @default(cuid())
+  uploadedByAdminId String
+  approvedByAdminId String?
+  type              MediaType
+  status            MediaStatus  @default(PENDING_REVIEW)
+  storageProvider   String
+  storageKey        String       @unique
+  url               String
+  embedUrl          String?
+  thumbnailUrl      String?
+  mimeType          String?
+  originalFilename  String?
+  extension         String?
+  checksum          String?
+  sourceUrl         String?
+  sourceName        String?
+  sizeBytes         BigInt?
+  width             Int?
+  height            Int?
+  durationSeconds   Int?
+  altText           String?
+  caption           String?
+  credit            String?
+  approvedAt        DateTime?
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+  uploadedByAdmin   AdminUser    @relation("MediaUploadedByAdmin", fields: [uploadedByAdminId], references: [id], onDelete: Restrict)
+  approvedByAdmin   AdminUser?   @relation("MediaApprovedByAdmin", fields: [approvedByAdminId], references: [id], onDelete: SetNull)
+  featuredInNews    News[]       @relation("NewsFeaturedMedia")
+  newsRelations     NewsMedia[]
+  aiDraftSuggestions AIDraftMediaSuggestion[]
+
+  @@index([status, type])
+  @@index([uploadedByAdminId])
+  @@index([approvedByAdminId])
+  @@index([createdAt])
+}
+
+model NewsMedia {
+  id                 String     @id @default(cuid())
+  newsId             String
+  mediaFileId        String
+  position           Int        @default(0)
+  captionOverride    String?
+  altTextOverride    String?
+  creditOverride     String?
+  isInline           Boolean    @default(false)
+  createdAt          DateTime   @default(now())
+  news               News       @relation(fields: [newsId], references: [id], onDelete: Cascade)
+  mediaFile          MediaFile  @relation(fields: [mediaFileId], references: [id], onDelete: Cascade)
+
+  @@unique([newsId, mediaFileId])
+  @@index([newsId, position])
+  @@index([mediaFileId])
+}
+
+model NewsSource {
+  id             String    @id @default(cuid())
+  newsId         String
+  title          String
+  url            String
+  publisherName  String?
+  sourceAuthor   String?
+  publishedAt    DateTime?
+  accessedAt     DateTime?
+  isPrimary      Boolean   @default(false)
+  sortOrder      Int       @default(0)
+  notes          String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  news           News      @relation(fields: [newsId], references: [id], onDelete: Cascade)
+
+  @@index([newsId, sortOrder])
+  @@index([url])
+}
+
+model Comment {
+  id                 String        @id @default(cuid())
+  newsId             String
+  userId             String
+  parentId           String?
+  approvedByAdminId  String?
+  rejectedByAdminId  String?
+  content            String
+  status             CommentStatus @default(PENDING)
+  moderationNote     String?
+  approvedAt         DateTime?
+  rejectedAt         DateTime?
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+  news               News          @relation(fields: [newsId], references: [id], onDelete: Cascade)
+  user               User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parent             Comment?      @relation("CommentThread", fields: [parentId], references: [id], onDelete: Cascade)
+  replies            Comment[]     @relation("CommentThread")
+  approvedByAdmin    AdminUser?    @relation("CommentApprovedByAdmin", fields: [approvedByAdminId], references: [id], onDelete: SetNull)
+  rejectedByAdmin    AdminUser?    @relation("CommentRejectedByAdmin", fields: [rejectedByAdminId], references: [id], onDelete: SetNull)
+
+  @@index([newsId, status, createdAt])
+  @@index([userId, createdAt])
+  @@index([parentId])
+}
+
+model AISearchConfig {
+  id                    String      @id @default(cuid())
+  createdByAdminId      String
+  updatedByAdminId      String?
+  categoryId            String?
+  countryId             String?
+  stateId               String?
+  cityId                String?
+  name                  String
+  description           String?
+  query                 String
+  sourceDomains         String[]
+  excludedDomains       String[]
+  keywords              String[]
+  excludedKeywords      String[]
+  languageCode          String?     @db.VarChar(8)
+  isActive              Boolean     @default(true)
+  lookbackHours         Int?
+  maxSourcesPerRun      Int?
+  cronExpression        String?
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+  createdByAdmin        AdminUser   @relation("AISearchConfigCreatedByAdmin", fields: [createdByAdminId], references: [id], onDelete: Restrict)
+  updatedByAdmin        AdminUser?  @relation("AISearchConfigUpdatedByAdmin", fields: [updatedByAdminId], references: [id], onDelete: SetNull)
+  category              Category?   @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  country               Country?    @relation(fields: [countryId], references: [id], onDelete: SetNull)
+  state                 State?      @relation(fields: [stateId], references: [id], onDelete: SetNull)
+  city                  City?       @relation(fields: [cityId], references: [id], onDelete: SetNull)
+  aiJobs                AIJob[]
+
+  @@index([isActive, categoryId])
+  @@index([countryId, stateId, cityId])
+  @@index([createdByAdminId])
+}
+
+model AIJob {
+  id                   String         @id @default(cuid())
+  aiSearchConfigId     String?
+  newsId               String?
+  createdByAdminId     String?
+  startedByAdminId     String?
+  completedByAdminId   String?
+  externalJobId        String?        @unique
+  jobType              String
+  status               AIJobStatus    @default(QUEUED)
+  promptVersion        String?
+  inputPayload         Json?
+  resultPayload        Json?
+  errorMessage         String?
+  queuedAt             DateTime       @default(now())
+  startedAt            DateTime?
+  completedAt          DateTime?
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @updatedAt
+  aiSearchConfig       AISearchConfig? @relation(fields: [aiSearchConfigId], references: [id], onDelete: SetNull)
+  news                 News?          @relation(fields: [newsId], references: [id], onDelete: SetNull)
+  createdByAdmin       AdminUser?     @relation("AIJobCreatedByAdmin", fields: [createdByAdminId], references: [id], onDelete: SetNull)
+  startedByAdmin       AdminUser?     @relation("AIJobStartedByAdmin", fields: [startedByAdminId], references: [id], onDelete: SetNull)
+  completedByAdmin     AdminUser?     @relation("AIJobCompletedByAdmin", fields: [completedByAdminId], references: [id], onDelete: SetNull)
+  aiDrafts             AIDraft[]
+
+  @@index([status, queuedAt])
+  @@index([aiSearchConfigId, status])
+  @@index([newsId])
+}
+
+model AIDraft {
+  id                       String                    @id @default(cuid())
+  aiJobId                  String?
+  newsId                   String?
+  categoryId               String?
+  authorId                 String?
+  countryId                String?
+  stateId                  String?
+  cityId                   String?
+  approvedByAdminId        String?
+  rejectedByAdminId        String?
+  suggestedTitle           String
+  suggestedSubtitle        String?
+  suggestedSlug            String?
+  suggestedSummary         String?
+  suggestedContent         String
+  suggestedSeoTitle        String?
+  suggestedSeoDescription  String?
+  suggestedTagNames        String[]
+  sourceUrls               String[]
+  sourceSnapshot           Json?
+  confidenceScore          Decimal?                 @db.Decimal(5, 2)
+  status                   AIDraftStatus            @default(PENDING_REVIEW)
+  reviewNotes              String?
+  generatedAt              DateTime                 @default(now())
+  reviewedAt               DateTime?
+  createdAt                DateTime                 @default(now())
+  updatedAt                DateTime                 @updatedAt
+  aiJob                    AIJob?                   @relation(fields: [aiJobId], references: [id], onDelete: SetNull)
+  news                     News?                    @relation(fields: [newsId], references: [id], onDelete: SetNull)
+  category                 Category?                @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  author                   Author?                  @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  country                  Country?                 @relation(fields: [countryId], references: [id], onDelete: SetNull)
+  state                    State?                   @relation(fields: [stateId], references: [id], onDelete: SetNull)
+  city                     City?                    @relation(fields: [cityId], references: [id], onDelete: SetNull)
+  approvedByAdmin          AdminUser?               @relation("AIDraftApprovedByAdmin", fields: [approvedByAdminId], references: [id], onDelete: SetNull)
+  rejectedByAdmin          AdminUser?               @relation("AIDraftRejectedByAdmin", fields: [rejectedByAdminId], references: [id], onDelete: SetNull)
+  mediaSuggestions         AIDraftMediaSuggestion[]
+
+  @@index([status, generatedAt])
+  @@index([aiJobId])
+  @@index([newsId])
+  @@index([categoryId, status])
+  @@index([countryId, stateId, cityId])
+}
+
+model AIDraftMediaSuggestion {
+  id                     String      @id @default(cuid())
+  aiDraftId              String
+  mediaFileId            String?
+  selectedByAdminId      String?
+  externalUrl            String?
+  reason                 String?
+  confidenceScore        Decimal?    @db.Decimal(5, 2)
+  sortOrder              Int         @default(0)
+  isSelected             Boolean     @default(false)
+  createdAt              DateTime    @default(now())
+  selectedAt             DateTime?
+  aiDraft                AIDraft     @relation(fields: [aiDraftId], references: [id], onDelete: Cascade)
+  mediaFile              MediaFile?  @relation(fields: [mediaFileId], references: [id], onDelete: SetNull)
+  selectedByAdmin        AdminUser?  @relation("AIDraftMediaSuggestionSelectedByAdmin", fields: [selectedByAdminId], references: [id], onDelete: SetNull)
+
+  @@index([aiDraftId, sortOrder])
+  @@index([mediaFileId])
+  @@index([selectedByAdminId])
+}
+
+model AuditLog {
+  id              String          @id @default(cuid())
+  adminUserId     String?
+  entityType      AuditEntityType
+  entityId        String
+  action          AuditAction
+  description     String?
+  metadata        Json?
+  createdAt       DateTime        @default(now())
+  adminUser       AdminUser?      @relation(fields: [adminUserId], references: [id], onDelete: SetNull)
+
+  @@index([entityType, entityId, createdAt])
+  @@index([adminUserId, createdAt])
+  @@index([action, createdAt])
+}
+
+model PublicationHistory {
+  id                 String      @id @default(cuid())
+  newsId             String
+  adminUserId        String?
+  previousStatus     NewsStatus
+  nextStatus         NewsStatus
+  titleSnapshot      String
+  slugSnapshot       String
+  note               String?
+  effectiveAt        DateTime?
+  createdAt          DateTime    @default(now())
+  news               News        @relation(fields: [newsId], references: [id], onDelete: Cascade)
+  adminUser          AdminUser?  @relation(fields: [adminUserId], references: [id], onDelete: SetNull)
+
+  @@index([newsId, createdAt])
+  @@index([adminUserId, createdAt])
+  @@index([nextStatus, effectiveAt])
+}

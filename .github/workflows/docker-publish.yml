@@ -41,6 +41,7 @@ jobs:
           images: ${{ env.IMAGE_NAME }}
           tags: |
             type=sha,format=short
+            type=sha,format=short,prefix=
             type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' }}
 
       - name: Build and push

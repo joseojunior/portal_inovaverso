@@ -28,16 +28,16 @@ export default async function AdminTagsPage() {
     <div className="space-y-8">
       <SectionHeading
         eyebrow="Tags"
-        title="Classificação granular"
-        description="Taxonomia complementar para refinar a descoberta de notícias e apoiar combinações editoriais."
+        title="Classificacao por assunto"
+        description="Refine o contexto das noticias com marcacoes tematicas consistentes."
       />
       <Card>
         <CardHeader>
-          <CardTitle>Uso no domínio</CardTitle>
+          <CardTitle>Boas praticas</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3 text-sm text-muted-foreground">
-          <p>Tags ampliam a classificação além da categoria principal e já estão ligadas ao núcleo editorial por `NewsTag`.</p>
-          <p>O módulo está preparado para reaproveitamento futuro em drafts editoriais e em filtros do portal público.</p>
+          <p>Prefira tags curtas e claras para melhorar descoberta e relacao entre materias.</p>
+          <p>Evite duplicidade de termos para manter o acervo organizado e facil de navegar.</p>
         </CardContent>
       </Card>
       <TagsAdminPanel

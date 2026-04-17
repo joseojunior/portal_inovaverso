@@ -25,7 +25,7 @@ export function LoginForm() {
       });
 
       if (!result || result.error) {
-        setErrorMessage("Credenciais inválidas ou acesso não autorizado.");
+        setErrorMessage("Credenciais invalidas ou acesso nao autorizado.");
         return;
       }
 
@@ -38,9 +38,7 @@ export function LoginForm() {
     <Card className="w-full max-w-md border-border/70 bg-card/95 shadow-lg backdrop-blur">
       <CardHeader className="space-y-2">
         <CardTitle className="text-2xl">Acesso administrativo</CardTitle>
-        <CardDescription>
-          Use um `AdminUser` ativo do banco para acessar a operação editorial.
-        </CardDescription>
+        <CardDescription>Entre com sua conta administrativa para acessar o painel editorial.</CardDescription>
       </CardHeader>
       <CardContent>
         <form action={handleSubmit} className="space-y-5">
@@ -54,7 +52,7 @@ export function LoginForm() {
           </div>
           {errorMessage ? <p className="text-sm text-destructive">{errorMessage}</p> : null}
           <Button type="submit" className="w-full" disabled={isPending}>
-            {isPending ? "Entrando..." : "Entrar no admin"}
+            {isPending ? "Entrando..." : "Entrar no painel"}
           </Button>
         </form>
       </CardContent>

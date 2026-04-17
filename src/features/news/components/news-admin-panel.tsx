@@ -364,7 +364,7 @@ export function NewsAdminPanel({
             <div>
               <CardTitle>{editingNews ? "Editar noticia" : "Nova noticia"}</CardTitle>
               <CardDescription>
-                Formulario editorial com taxonomia, SEO, destaque principal e galeria apoiada em `MediaFile`.
+                Formulario editorial com taxonomia, SEO, capa principal e galeria de apoio.
               </CardDescription>
             </div>
             <Button type="button" variant="ghost" size="icon" onClick={resetForm}>
@@ -596,7 +596,7 @@ export function NewsAdminPanel({
               <div>
                 <Label>Midias associadas</Label>
                 <p className="text-xs text-muted-foreground">
-                  Anexe mais de uma imagem ou video a materia. A midia principal tambem entra na relacao via `NewsMedia`.
+                  Anexe mais de uma imagem ou video a materia para enriquecer a leitura.
                 </p>
               </div>
               {mediaItems.length > 0 ? (
@@ -655,7 +655,7 @@ export function NewsAdminPanel({
                 </div>
               ) : (
                 <div className="rounded-xl border border-dashed border-border/70 bg-background/50 px-4 py-5 text-sm text-muted-foreground">
-                  Nenhuma midia disponivel ainda. Cadastre imagens ou videos em `/admin/media` antes de montar a materia.
+                  Nenhuma midia disponivel ainda. Cadastre imagens ou videos na biblioteca antes de montar a materia.
                 </div>
               )}
               {state.fieldErrors?.mediaIds ? <p className="text-xs text-destructive">{state.fieldErrors.mediaIds[0]}</p> : null}

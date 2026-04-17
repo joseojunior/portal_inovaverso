@@ -76,7 +76,7 @@ export default async function AdminAIJobsPage() {
                     <div className="grid gap-1">
                       <p>Drafts gerados: {job._count.aiDrafts}</p>
                       <p>Prompt version: {job.promptVersion ?? "Nao registrada"}</p>
-                      <p>External job: {job.externalJobId ?? "Interno/local"}</p>
+                      <p>Execucao externa: {job.externalJobId ?? "Nao vinculada"}</p>
                     </div>
                   </div>
                   {job.news ? (

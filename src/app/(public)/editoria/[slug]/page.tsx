@@ -18,16 +18,13 @@ export async function generateMetadata({ params }: PublicCategoryPageProps): Pro
 
   if (!category) {
     return {
-      title: "Categoria não encontrada"
+      title: "Editoria nao encontrada"
     };
   }
 
   return {
     title: category.seoTitle ?? category.name,
-    description:
-      category.seoDescription ??
-      category.description ??
-      `Cobertura pública da editoria ${category.name} no Portal Inovaverso.`
+    description: category.seoDescription ?? category.description ?? `Cobertura da editoria ${category.name}.`
   };
 }
 
@@ -45,13 +42,13 @@ export default async function PublicCategoryPage({ params }: PublicCategoryPageP
       title={category.name}
       description={
         category.description ??
-        `Seleção pública de matérias publicadas na editoria ${category.name}, com leitura contínua e visual consistente com a home do portal.`
+        `Acompanhe as materias publicadas na editoria ${category.name} com atualizacao continua.`
       }
       items={category.news}
-      asideTitle="Recorte editorial"
-      asideBody="Esta página reúne apenas notícias publicadas desta editoria, preservando o mesmo padrão visual da home e preparando o terreno para filtros mais avançados depois."
-      emptyTitle="Nenhuma matéria publicada nesta editoria"
-      emptyDescription="Quando houver publicações com status PUBLISHED vinculadas a esta categoria, elas aparecerão aqui automaticamente."
+      asideTitle="Cobertura em foco"
+      asideBody="Selecao editorial com os principais assuntos desta editoria."
+      emptyTitle="Nenhuma materia publicada nesta editoria"
+      emptyDescription="Quando novas publicacoes forem ao ar, elas aparecerao automaticamente aqui."
     />
   );
 }

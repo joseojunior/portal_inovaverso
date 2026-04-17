@@ -53,15 +53,15 @@ export default async function AdminAIConfigsPage() {
       <SectionHeading
         eyebrow="IA Editorial"
         title="Configuracoes de busca"
-        description="Base administrativa para organizar escopos, filtros e prioridades das futuras rotinas de IA editorial."
+        description="Organize temas, filtros e prioridades para apoio de pauta e rascunhos assistidos."
       />
       <Card>
         <CardHeader>
           <CardTitle>Escopo desta etapa</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3 text-sm text-muted-foreground">
-          <p>As configuracoes definem contexto editorial e parametros de coleta em Google News RSS.</p>
-          <p>A execucao manual gera job com draft de IA em estado pendente para curadoria humana obrigatoria.</p>
+          <p>As configuracoes definem contexto editorial e criterios de coleta de fontes.</p>
+          <p>Cada execucao gera sugestoes para revisao humana antes de qualquer publicacao.</p>
         </CardContent>
       </Card>
       <AISearchConfigsAdminPanel

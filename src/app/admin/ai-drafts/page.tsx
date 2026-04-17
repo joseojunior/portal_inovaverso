@@ -47,8 +47,8 @@ export default async function AdminAIDraftsPage() {
     <div className="space-y-8">
       <SectionHeading
         eyebrow="IA Editorial"
-        title="Drafts gerados"
-        description="Fila de revisao humana para rascunhos de IA, sempre sem publicacao automatica."
+        title="Sugestoes geradas"
+        description="Fila de revisao humana para rascunhos assistidos, sempre sem publicacao automatica."
       />
       <div className="grid gap-4">
         {drafts.length > 0 ? (
@@ -109,7 +109,7 @@ export default async function AdminAIDraftsPage() {
               <p>Quando a camada de IA interna gerar rascunhos, eles aparecerao aqui para revisao humana obrigatoria.</p>
               <div className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/70 px-3 py-1 text-xs">
                 <FileText className="size-3.5" />
-                Drafts entram pendentes por padrao
+                Sugestoes entram pendentes por padrao
               </div>
             </CardContent>
           </Card>

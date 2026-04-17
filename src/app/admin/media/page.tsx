@@ -36,17 +36,16 @@ export default async function AdminMediaPage() {
     <div className="space-y-8">
       <SectionHeading
         eyebrow="Midia"
-        title="Biblioteca editorial"
-        description="Upload de imagens, cadastro de video embedado, revisao editorial e estrutura pronta para featured media e galeria."
+        title="Biblioteca visual"
+        description="Gerencie imagens e videos incorporados com revisao editorial antes da publicacao."
       />
       <Card>
         <CardHeader>
-          <CardTitle>Fluxo da etapa</CardTitle>
+          <CardTitle>Fluxo recomendado</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3 text-sm text-muted-foreground">
-          <p>1. Admin envia uma imagem ao storage ou registra um video embedado por URL.</p>
-          <p>2. O sistema cria o ativo em `MediaFile` com `pending_review` e preserva o tipo da midia.</p>
-          <p>3. A midia fica listada com preview e pode ser revisada antes de uso em noticias publicadas.</p>
+          <p>Envie os arquivos, complete os metadados e revise o status antes de usar nas materias.</p>
+          <p>Mantenha credito e origem atualizados para fortalecer transparencia e padrao editorial.</p>
         </CardContent>
       </Card>
       <MediaLibraryPanel

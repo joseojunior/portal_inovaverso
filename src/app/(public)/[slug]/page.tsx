@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: PublicNewsPageProps): Promise
 
   if (!article) {
     return {
-      title: "Notícia não encontrada"
+      title: "Materia nao encontrada"
     };
   }
 

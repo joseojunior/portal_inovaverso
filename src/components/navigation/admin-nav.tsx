@@ -13,9 +13,9 @@ const items = [
   { href: "/admin/categories", label: "Categorias", icon: FolderTree },
   { href: "/admin/tags", label: "Tags", icon: Hash },
   { href: "/admin/authors", label: "Autores", icon: UserSquare2 },
-  { href: "/admin/ai-configs", label: "IA Configs", icon: Bot },
-  { href: "/admin/ai-jobs", label: "IA Jobs", icon: PlayCircle },
-  { href: "/admin/ai-drafts", label: "IA Drafts", icon: FileText },
+  { href: "/admin/ai-configs", label: "IA - Configuracoes", icon: Bot },
+  { href: "/admin/ai-jobs", label: "IA - Execucoes", icon: PlayCircle },
+  { href: "/admin/ai-drafts", label: "IA - Sugestoes", icon: FileText },
   { href: "/admin/settings", label: "Configuracoes", icon: Settings }
 ];
 

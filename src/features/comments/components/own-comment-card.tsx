@@ -60,7 +60,7 @@ export function OwnCommentCard({ comment, newsId, newsSlug }: OwnCommentCardProp
         ) : null}
         <div className="flex gap-3">
           <Button type="submit" variant="outline">
-            Salvar edicao
+            Salvar alteracao
           </Button>
         </div>
       </form>

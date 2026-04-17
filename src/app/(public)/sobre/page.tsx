@@ -6,20 +6,20 @@ export default function AboutPage() {
     <div className="mx-auto flex w-full max-w-5xl flex-col gap-8 px-6 py-12 md:py-16">
       <SectionHeading
         eyebrow="Sobre"
-        title="Portal pronto para governança editorial profissional"
-        description="A fundação técnica respeita a separação entre experiência pública, operação interna e domínio do negócio."
+        title="Jornalismo digital com curadoria humana"
+        description="O Portal Inovaverso combina agilidade, criterio editorial e experiencia de leitura moderna."
       />
       <Card className="border-border/70 bg-card/90">
         <CardHeader>
-          <CardTitle>Direção desta etapa</CardTitle>
+          <CardTitle>Nossa proposta</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4 text-sm leading-7 text-muted-foreground">
           <p>
-            Nesta fase, a plataforma entrega base de projeto, autenticação inicial, layouts e modelagem
-            relacional sem ainda ativar fluxos complexos de redação, comentários ou IA.
+            Publicamos conteudo relevante para o dia a dia, com foco em contexto, confiabilidade e linguagem clara.
           </p>
           <p>
-            Isso mantém a arquitetura coerente desde o início e reduz retrabalho nas próximas etapas do produto.
+            A plataforma foi desenhada para evoluir continuamente, com novas secoes, formatos de midia e recursos para
+            comunidade.
           </p>
         </CardContent>
       </Card>

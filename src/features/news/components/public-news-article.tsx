@@ -19,7 +19,7 @@ function ContentBlocks({ content }: { content: string | null }) {
   if (blocks.length === 0) {
     return (
       <p className="text-lg leading-8 text-white/70">
-        Esta materia ainda nao recebeu corpo editorial completo, mas ja esta publicada no portal.
+        Esta materia ainda esta em atualizacao de conteudo.
       </p>
     );
   }
@@ -110,7 +110,7 @@ export function PublicNewsArticle({ article }: PublicNewsArticleProps) {
           </div>
         ) : (
           <div className="rounded-[1.9rem] border border-dashed border-white/12 bg-[linear-gradient(135deg,rgba(255,255,255,0.03),rgba(255,255,255,0.01))] px-6 py-8 text-sm leading-6 text-white/52">
-            Estrutura pronta para featured media. Quando a materia ainda nao tiver midia principal definida, esta area acomoda imagem ou video sem quebrar a leitura.
+            Em breve esta materia recebera destaque visual.
           </div>
         )}
       </header>
@@ -131,7 +131,7 @@ export function PublicNewsArticle({ article }: PublicNewsArticleProps) {
             <section className="space-y-4 rounded-[1.75rem] border border-white/10 bg-[rgba(255,255,255,0.02)] p-6">
               <div className="space-y-2">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#52d4ff]">Midias associadas</p>
-                <p className="text-sm text-white/52">Galeria basica com imagens e videos embedados vinculados a materia.</p>
+                <p className="text-sm text-white/52">Galeria de apoio com imagens e videos relacionados.</p>
               </div>
               <div className="grid gap-4 md:grid-cols-2">
                 {article.gallery.map((item) => (

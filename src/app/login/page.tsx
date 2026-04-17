@@ -9,15 +9,15 @@ export default function LoginPage() {
         <div className="space-y-6">
           <div className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/80 px-4 py-2 text-sm text-muted-foreground">
             <ShieldCheck className="size-4 text-primary" />
-            Autenticação inicial do painel administrativo
+            Acesso seguro do painel editorial
           </div>
           <div className="space-y-4">
             <h1 className="max-w-3xl text-5xl font-semibold tracking-tight text-foreground">
-              Base de acesso segura para a operação editorial.
+              Controle de publicacao e operacao do portal.
             </h1>
             <p className="max-w-2xl text-lg leading-8 text-muted-foreground">
-              O acesso administrativo agora usa `AdminUser` persistido no banco. O próximo passo natural é
-              evoluir permissões e gestão operacional sobre esse núcleo autenticado.
+              Esta area e exclusiva para equipes autorizadas. Use seu acesso administrativo para revisar, publicar e
+              gerenciar o conteudo do portal.
             </p>
           </div>
         </div>

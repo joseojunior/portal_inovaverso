@@ -12,15 +12,15 @@ export function AdminSidebar() {
         </div>
         <h2 className="mt-4 text-2xl font-semibold">Portal Inovaverso</h2>
         <p className="mt-2 text-sm leading-6 text-sidebar-foreground/70">
-          Operação editorial, mídia, taxonomia e governança do portal.
+          Gestao de noticias, midia, equipe editorial e operacao do portal.
         </p>
       </div>
       <div className="flex flex-1 flex-col px-4 py-6">
         <AdminNav />
         <div className="mt-6 rounded-2xl border border-sidebar-border bg-sidebar-accent/40 p-4">
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sidebar-primary">Base pronta</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sidebar-primary">Atualizacao continua</p>
           <p className="mt-2 text-sm leading-6 text-sidebar-foreground/75">
-            Estrutura visual preparada para notícias, mídia, comentários, IA e logs sem retrabalho de layout.
+            Este painel evolui com novos fluxos para publicar, revisar e distribuir conteudo com consistencia.
           </p>
         </div>
       </div>

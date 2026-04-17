@@ -9,14 +9,14 @@ export default function PublicLoginPage() {
         <div className="space-y-6">
           <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-white/58">
             <MessageSquareMore className="size-4 text-[#52d4ff]" />
-            Acesso publico para comentarios moderados
+            Participe das conversas da comunidade
           </div>
           <div className="space-y-4">
             <h1 className="max-w-3xl text-5xl font-semibold tracking-tight text-white">
-              Participe da conversa sem abrir mao da curadoria editorial.
+              Sua opiniao fortalece a cobertura editorial.
             </h1>
             <p className="max-w-2xl text-lg leading-8 text-white/62">
-              O portal aceita comentarios apenas de usuarios autenticados. Cada envio entra em moderacao antes de aparecer publicamente.
+              Os comentarios passam por moderacao para manter um ambiente respeitoso e relevante para todos os leitores.
             </p>
           </div>
         </div>

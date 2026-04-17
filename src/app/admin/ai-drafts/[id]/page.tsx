@@ -92,8 +92,8 @@ export default async function AdminAIDraftReviewPage({ params }: AdminAIDraftRev
           <CardTitle>Regra editorial ativa</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3 text-sm text-muted-foreground">
-          <p>Draft de IA nunca publica automaticamente. A conversao apenas cria uma noticia em `DRAFT_AI`.</p>
-          <p>Depois da conversao, o conteudo segue o fluxo editorial normal no modulo de noticias.</p>
+          <p>Sugestoes de IA nunca sao publicadas automaticamente.</p>
+          <p>Apos conversao, a materia entra no fluxo editorial para revisao e publicacao manual.</p>
         </CardContent>
       </Card>
       <AIDraftReviewPanel

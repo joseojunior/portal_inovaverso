@@ -78,6 +78,17 @@ function splitList(value?: string) {
   );
 }
 
+function normalizeSuggestedTagNames(names: string[]) {
+  return Array.from(
+    new Set(
+      names
+        .map((name) => name.trim())
+        .filter((name) => name.length >= 2)
+        .slice(0, 8)
+    )
+  );
+}
+
 function buildDraftSlug(title: string, incomingSlug?: string) {
   return slugify(incomingSlug && incomingSlug.trim().length > 0 ? incomingSlug : title);
 }
@@ -432,6 +443,7 @@ export async function convertAIDraftToNewsAction(
       newsId: true,
       aiJobId: true,
       sourceUrls: true,
+      suggestedTagNames: true,
       mediaSuggestions: {
         select: {
           id: true,
@@ -457,6 +469,7 @@ export async function convertAIDraftToNewsAction(
 
   const uniqueTagIds = Array.from(new Set(data.tagIds));
   const selectedSuggestionIds = Array.from(new Set(data.selectedMediaSuggestionIds));
+  const suggestedTagNames = normalizeSuggestedTagNames(draft.suggestedTagNames);
 
   const [category, author, state, city, tags, slugOwner] = await Promise.all([
     db.category.findUnique({ where: { id: data.categoryId }, select: { id: true } }),
@@ -501,9 +514,33 @@ export async function convertAIDraftToNewsAction(
   try {
     await db.$transaction(async (tx) => {
       const selectedSuggestions = draft.mediaSuggestions.filter((suggestion) => selectedSuggestionIds.includes(suggestion.id));
+      const fallbackSuggestions =
+        selectedSuggestionIds.length > 0 ? selectedSuggestions : draft.mediaSuggestions.slice(0, Math.min(3, draft.mediaSuggestions.length));
+      const effectiveSuggestions = selectedSuggestionIds.length > 0 ? selectedSuggestions : fallbackSuggestions;
       const connectedMediaIds: string[] = [];
+      const effectiveTagIds = [...uniqueTagIds];
 
-      for (const suggestion of selectedSuggestions) {
+      if (effectiveTagIds.length === 0 && suggestedTagNames.length > 0) {
+        for (const suggestedName of suggestedTagNames) {
+          const tagSlug = slugify(suggestedName);
+          if (!tagSlug) continue;
+
+          const tag = await tx.tag.upsert({
+            where: { slug: tagSlug },
+            update: { isActive: true },
+            create: {
+              name: suggestedName,
+              slug: tagSlug,
+              isActive: true
+            },
+            select: { id: true }
+          });
+
+          effectiveTagIds.push(tag.id);
+        }
+      }
+
+      for (const suggestion of effectiveSuggestions) {
         if (suggestion.mediaFileId) {
           connectedMediaIds.push(suggestion.mediaFileId);
           continue;
@@ -556,9 +593,9 @@ export async function convertAIDraftToNewsAction(
         }
       });
 
-      if (uniqueTagIds.length > 0) {
+      if (effectiveTagIds.length > 0) {
         await tx.newsTag.createMany({
-          data: uniqueTagIds.map((tagId) => ({ newsId: news.id, tagId }))
+          data: Array.from(new Set(effectiveTagIds)).map((tagId) => ({ newsId: news.id, tagId }))
         });
       }
 
@@ -597,9 +634,9 @@ export async function convertAIDraftToNewsAction(
         }
       });
 
-      if (selectedSuggestions.length > 0) {
+      if (effectiveSuggestions.length > 0) {
         await tx.aIDraftMediaSuggestion.updateMany({
-          where: { id: { in: selectedSuggestions.map((suggestion) => suggestion.id) } },
+          where: { id: { in: effectiveSuggestions.map((suggestion) => suggestion.id) } },
           data: {
             isSelected: true,
             selectedByAdminId: adminUser.id,

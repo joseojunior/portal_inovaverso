@@ -21,7 +21,7 @@ export function CommentCreateForm({ newsId, newsSlug }: CommentCreateFormProps) 
       <input type="hidden" name="newsSlug" value={newsSlug} />
       <Textarea
         name="content"
-        placeholder="Escreva seu comentario sobre a materia..."
+        placeholder="Escreva seu comentario..."
         className="min-h-28 border-white/12 bg-black/10 text-white placeholder:text-white/35"
       />
       {state.fieldErrors?.content ? <p className="text-sm text-[#ff8c7a]">{state.fieldErrors.content[0]}</p> : null}

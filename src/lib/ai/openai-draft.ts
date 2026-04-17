@@ -5,11 +5,11 @@ import type { AIExternalDraftInput } from "@/lib/ai/types";
 
 const llmDraftSchema = z.object({
   title: z.string().min(8),
-  subtitle: z.string().max(180).nullable().optional(),
-  summary: z.string().max(320).nullable().optional(),
+  subtitle: z.string().nullable().optional(),
+  summary: z.string().nullable().optional(),
   content: z.string().min(120),
-  seoTitle: z.string().max(70).nullable().optional(),
-  seoDescription: z.string().max(160).nullable().optional(),
+  seoTitle: z.string().nullable().optional(),
+  seoDescription: z.string().nullable().optional(),
   suggestedTagNames: z.array(z.string().min(1)).max(15).default([]),
   confidenceScore: z.number().min(0).max(100).nullable().optional()
 });
@@ -18,6 +18,12 @@ function toNullable(value: string | null | undefined) {
   if (!value) return null;
   const normalized = value.trim();
   return normalized.length > 0 ? normalized : null;
+}
+
+function clampText(value: string | null | undefined, max: number) {
+  const normalized = toNullable(value);
+  if (!normalized) return null;
+  return normalized.length > max ? normalized.slice(0, max).trim() : normalized;
 }
 
 function extractFirstJsonObject(text: string) {
@@ -29,6 +35,38 @@ function extractFirstJsonObject(text: string) {
   }
 
   return text.slice(start, end + 1);
+}
+
+function extractOutputText(payload: unknown) {
+  if (!payload || typeof payload !== "object") {
+    return "";
+  }
+
+  const response = payload as {
+    output_text?: string;
+    output?: Array<{
+      content?: Array<{
+        type?: string;
+        text?: string;
+      }>;
+    }>;
+  };
+
+  const topLevel = response.output_text?.trim();
+  if (topLevel) {
+    return topLevel;
+  }
+
+  const contentText =
+    response.output
+      ?.flatMap((item) => item.content ?? [])
+      .filter((item) => item?.type === "output_text" && typeof item.text === "string")
+      .map((item) => item.text?.trim() ?? "")
+      .filter((value) => value.length > 0)
+      .join("\n")
+      .trim() ?? "";
+
+  return contentText;
 }
 
 export async function generateDraftWithOpenAI(input: {
@@ -73,8 +111,8 @@ export async function generateDraftWithOpenAI(input: {
     body: JSON.stringify({
       model,
       input: [
-        { role: "system", content: [{ type: "text", text: systemPrompt }] },
-        { role: "user", content: [{ type: "text", text: userPrompt }] }
+        { role: "system", content: [{ type: "input_text", text: systemPrompt }] },
+        { role: "user", content: [{ type: "input_text", text: userPrompt }] }
       ],
       max_output_tokens: 1400
     })
@@ -85,25 +123,22 @@ export async function generateDraftWithOpenAI(input: {
     throw new Error(`Falha OpenAI (${response.status}): ${errorBody.slice(0, 300)}`);
   }
 
-  const json = (await response.json()) as {
-    output_text?: string;
-  };
-
-  const outputText = json.output_text?.trim();
+  const json = (await response.json()) as unknown;
+  const outputText = extractOutputText(json);
 
   if (!outputText) {
-    throw new Error("OpenAI retornou resposta vazia.");
+    throw new Error("OpenAI retornou resposta sem texto utilizavel.");
   }
 
   const parsed = llmDraftSchema.parse(JSON.parse(extractFirstJsonObject(outputText)));
 
   const draft: AIExternalDraftInput = {
     title: parsed.title.trim(),
-    subtitle: toNullable(parsed.subtitle),
-    summary: toNullable(parsed.summary),
+    subtitle: clampText(parsed.subtitle, 180),
+    summary: clampText(parsed.summary, 320),
     content: parsed.content.trim(),
-    seoTitle: toNullable(parsed.seoTitle),
-    seoDescription: toNullable(parsed.seoDescription),
+    seoTitle: clampText(parsed.seoTitle, 70),
+    seoDescription: clampText(parsed.seoDescription, 160),
     suggestedTagNames: parsed.suggestedTagNames,
     confidenceScore: parsed.confidenceScore ?? null,
     categorySlug: input.categorySlug,
@@ -124,4 +159,3 @@ export async function generateDraftWithOpenAI(input: {
     model
   };
 }
-

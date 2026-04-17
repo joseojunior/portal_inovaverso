@@ -12,7 +12,6 @@ function parseSocialLinks(value: unknown): SocialLinksRecord | null {
   }
 
   const entries = Object.entries(value).filter((entry): entry is [string, string] => typeof entry[1] === "string");
-
   return entries.length > 0 ? Object.fromEntries(entries) : null;
 }
 
@@ -41,16 +40,16 @@ export default async function AdminAuthorsPage() {
     <div className="space-y-8">
       <SectionHeading
         eyebrow="Autores"
-        title="Perfis editoriais"
-        description="Gestão de autores preparada para vínculo com notícias e futura página pública individual."
+        title="Perfis de autoria"
+        description="Gerencie os autores e mantenha uma identidade editorial consistente nas publicacoes."
       />
       <Card>
         <CardHeader>
-          <CardTitle>Modelo disponível</CardTitle>
+          <CardTitle>Boas praticas</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3 text-sm text-muted-foreground">
-          <p>Autores mantêm identidade editorial própria, sem se confundir com contas administrativas.</p>
-          <p>O perfil já suporta avatar, bio, slug estável e links sociais para exposição pública futura.</p>
+          <p>Mantenha biografias objetivas e links atualizados para fortalecer credibilidade.</p>
+          <p>Use avatar e slug padronizados para melhorar a experiencia na pagina publica de autoria.</p>
         </CardContent>
       </Card>
       <AuthorsAdminPanel

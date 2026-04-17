@@ -13,13 +13,13 @@ export async function AdminHeader() {
       <div className="flex flex-col gap-4 px-6 py-4">
         <div className="flex items-center justify-between gap-4">
           <div>
-            <p className="text-sm text-muted-foreground">Ambiente protegido</p>
-            <h1 className="text-xl font-semibold text-foreground">Painel administrativo</h1>
+            <p className="text-sm text-muted-foreground">Area restrita</p>
+            <h1 className="text-xl font-semibold text-foreground">Painel editorial</h1>
           </div>
           <div className="flex items-center gap-3">
             <Badge variant="accent" className="hidden gap-1 rounded-full px-3 py-1 sm:inline-flex">
               <ShieldCheck className="size-3.5" />
-              {session?.user?.role ?? "Acesso autenticado"}
+              {session?.user?.role ?? "Acesso autorizado"}
             </Badge>
             <form
               action={async () => {
@@ -36,10 +36,8 @@ export async function AdminHeader() {
         </div>
         <div className="flex items-center justify-between gap-4">
           <div className="min-w-0">
-            <p className="truncate text-sm font-medium text-foreground">
-              {session?.user?.name ?? "Operador administrativo"}
-            </p>
-            <p className="truncate text-sm text-muted-foreground">{session?.user?.email ?? "Sessão ativa"}</p>
+            <p className="truncate text-sm font-medium text-foreground">{session?.user?.name ?? "Equipe editorial"}</p>
+            <p className="truncate text-sm text-muted-foreground">{session?.user?.email ?? "Sessao ativa"}</p>
           </div>
           <AdminNav mobile />
         </div>

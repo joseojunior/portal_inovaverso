@@ -38,16 +38,16 @@ export default async function AdminCategoriesPage() {
     <div className="space-y-8">
       <SectionHeading
         eyebrow="Categorias"
-        title="Taxonomia editorial"
-        description="Fundação para classificação de notícias e agrupamento de cobertura."
+        title="Organizacao editorial"
+        description="Defina as secoes do portal e mantenha a cobertura bem estruturada."
       />
       <Card>
         <CardHeader>
-          <CardTitle>Modelagem disponível</CardTitle>
+          <CardTitle>Boas praticas</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3 text-sm text-muted-foreground">
-          <p>Categorias possuem `name`, `slug` e `description` no schema Prisma.</p>
-          <p>Tags e relações N:N com notícias e drafts futuros já estão previstas.</p>
+          <p>Use nomes diretos e slugs curtos para facilitar navegacao e SEO.</p>
+          <p>Revise periodicamente categorias pouco usadas para manter a estrutura objetiva.</p>
         </CardContent>
       </Card>
       <CategoriesAdminPanel

@@ -18,13 +18,13 @@ export async function generateMetadata({ params }: PublicAuthorPageProps): Promi
 
   if (!author) {
     return {
-      title: "Autor não encontrado"
+      title: "Autor nao encontrado"
     };
   }
 
   return {
     title: author.name,
-    description: author.bio ?? `Perfil público de ${author.name} com suas matérias publicadas no portal.`
+    description: author.bio ?? `Perfil de ${author.name} com suas materias publicadas no portal.`
   };
 }
 
@@ -42,14 +42,14 @@ export default async function PublicAuthorPage({ params }: PublicAuthorPageProps
       title={author.name}
       description={
         author.bio ??
-        `Página pública de autoria com a lista de matérias publicadas por ${author.name}, pronta para evoluir depois com perfil editorial mais completo.`
+        `Acompanhe as materias assinadas por ${author.name} e veja a cobertura editorial por autoria.`
       }
       items={author.news}
-      asideTitle="Perfil editorial"
-      asideBody="A área de autoria já acomoda identidade pública, histórico de publicações e poderá receber redes sociais, avatar expandido e biografia longa depois."
+      asideTitle="Sobre o autor"
+      asideBody="Aqui voce encontra as publicacoes mais recentes do autor e seu historico no portal."
       avatarUrl={author.avatarUrl}
-      emptyTitle="Nenhuma matéria publicada por este autor"
-      emptyDescription="Quando houver notícias publicadas associadas a este autor, elas serão exibidas aqui automaticamente."
+      emptyTitle="Nenhuma materia publicada por este autor"
+      emptyDescription="Assim que novas publicacoes forem ao ar, elas aparecerao nesta pagina."
     />
   );
 }

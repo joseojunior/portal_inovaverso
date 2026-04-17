@@ -8,27 +8,26 @@ export default function AdminSettingsPage() {
   return (
     <div className="space-y-8">
       <SectionHeading
-        eyebrow="Configurações"
-        title="Configuração operacional inicial"
-        description="Espaço reservado para parâmetros do portal, autenticação e futuras integrações."
+        eyebrow="Configuracoes"
+        title="Preferencias do portal"
+        description="Area dedicada a ajustes globais da operacao editorial e identidade da plataforma."
       />
       <Card>
         <CardHeader>
-          <CardTitle>Ambiente atual</CardTitle>
+          <CardTitle>Visao geral</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3 text-sm text-muted-foreground">
-          <p>Autenticação inicial via `next-auth` com provider de credenciais.</p>
-          <p>Segredo, URL da aplicação e credenciais administrativas vêm do `.env`.</p>
-          <p>Próxima etapa: migrar para fluxo persistido com usuários e permissões completas.</p>
+          <p>Centralize aqui politicas de acesso, parametros operacionais e diretrizes de publicacao.</p>
+          <p>Use este modulo para manter padrao entre equipe, conteudo e experiencia dos leitores.</p>
         </CardContent>
       </Card>
       <PagePlaceholder
-        title="Configurações centrais do portal"
-        description="A interface já comporta evolução para parâmetros operacionais, identidade editorial e integrações administrativas."
+        title="Configuracoes centrais do portal"
+        description="A interface esta preparada para consolidar ajustes institucionais e operacionais em um unico lugar."
         bullets={[
-          "Credenciais, políticas de sessão e parâmetros institucionais.",
-          "Configurações futuras de IA, mídia e módulos do painel.",
-          "Área adequada para controles globais sem misturar com o portal público."
+          "Politicas de acesso e seguranca para equipe editorial.",
+          "Preferencias de publicacao, moderacao e operacao diaria.",
+          "Parametros globais de integracoes e funcionalidades do painel."
         ]}
         icon={<Settings className="size-5" />}
       />

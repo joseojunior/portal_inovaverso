@@ -43,9 +43,9 @@ type MediaLibraryPanelProps = {
 };
 
 const mediaStatusOptions: Array<{ value: MediaStatus; label: string }> = [
-  { value: "PENDING_REVIEW", label: "Pending review" },
-  { value: "APPROVED", label: "Approved" },
-  { value: "REJECTED", label: "Rejected" }
+  { value: "PENDING_REVIEW", label: "Em revisao" },
+  { value: "APPROVED", label: "Aprovada" },
+  { value: "REJECTED", label: "Rejeitada" }
 ];
 
 const emptyMetadataForm = {
@@ -162,7 +162,7 @@ export function MediaLibraryPanel({ items }: MediaLibraryPanelProps) {
         <Card className="border-border/70 bg-card/95">
           <CardHeader className="space-y-3">
             <CardTitle>Upload de imagem</CardTitle>
-            <CardDescription>Envio para Supabase Storage com registro imediato em `MediaFile` e status `pending_review`.</CardDescription>
+            <CardDescription>Envie imagens para a biblioteca e revise antes de usar nas materias.</CardDescription>
             {uploadState.message ? (
               <div
                 className={cn(
@@ -189,20 +189,20 @@ export function MediaLibraryPanel({ items }: MediaLibraryPanelProps) {
                 <Input id="altText" name="altText" />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="caption">Caption</Label>
+                <Label htmlFor="caption">Legenda</Label>
                 <Textarea id="caption" name="caption" />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="credit">Credit</Label>
+                <Label htmlFor="credit">Credito</Label>
                 <Input id="credit" name="credit" />
               </div>
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="sourceName">Source name</Label>
+                  <Label htmlFor="sourceName">Nome da fonte</Label>
                   <Input id="sourceName" name="sourceName" />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="sourceUrl">Source URL</Label>
+                  <Label htmlFor="sourceUrl">URL da fonte</Label>
                   <Input id="sourceUrl" name="sourceUrl" placeholder="https://..." />
                 </div>
               </div>
@@ -216,8 +216,8 @@ export function MediaLibraryPanel({ items }: MediaLibraryPanelProps) {
 
         <Card className="border-border/70 bg-card/95">
           <CardHeader className="space-y-3">
-            <CardTitle>Cadastro de video embedado</CardTitle>
-            <CardDescription>Registro editorial de video por URL de YouTube ou Vimeo, sem upload proprio.</CardDescription>
+            <CardTitle>Cadastro de video incorporado</CardTitle>
+            <CardDescription>Adicione videos por URL (YouTube ou Vimeo), sem upload local.</CardDescription>
             {embedState.message ? (
               <div
                 className={cn(
@@ -244,20 +244,20 @@ export function MediaLibraryPanel({ items }: MediaLibraryPanelProps) {
                 <Input id="embed-altText" name="altText" placeholder="Titulo ou descricao curta do video" />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="embed-caption">Caption</Label>
+                <Label htmlFor="embed-caption">Legenda</Label>
                 <Textarea id="embed-caption" name="caption" />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="embed-credit">Credit</Label>
+                <Label htmlFor="embed-credit">Credito</Label>
                 <Input id="embed-credit" name="credit" />
               </div>
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="embed-sourceName">Source name</Label>
+                  <Label htmlFor="embed-sourceName">Nome da fonte</Label>
                   <Input id="embed-sourceName" name="sourceName" placeholder="YouTube, Vimeo ou fonte editorial" />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="embed-sourceUrl">Source URL</Label>
+                  <Label htmlFor="embed-sourceUrl">URL da fonte</Label>
                   <Input id="embed-sourceUrl" name="sourceUrl" placeholder="https://..." />
                 </div>
               </div>
@@ -321,7 +321,7 @@ export function MediaLibraryPanel({ items }: MediaLibraryPanelProps) {
                   </div>
                 ) : null}
                 <div className="space-y-2">
-                  <Label htmlFor="metadata-altText">Alt text</Label>
+                  <Label htmlFor="metadata-altText">Texto alternativo</Label>
                   <Input
                     id="metadata-altText"
                     name="altText"
@@ -330,7 +330,7 @@ export function MediaLibraryPanel({ items }: MediaLibraryPanelProps) {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="metadata-caption">Caption</Label>
+                  <Label htmlFor="metadata-caption">Legenda</Label>
                   <Textarea
                     id="metadata-caption"
                     name="caption"
@@ -339,7 +339,7 @@ export function MediaLibraryPanel({ items }: MediaLibraryPanelProps) {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="metadata-credit">Credit</Label>
+                  <Label htmlFor="metadata-credit">Credito</Label>
                   <Input
                     id="metadata-credit"
                     name="credit"
@@ -349,7 +349,7 @@ export function MediaLibraryPanel({ items }: MediaLibraryPanelProps) {
                 </div>
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
-                    <Label htmlFor="metadata-sourceName">Source name</Label>
+                    <Label htmlFor="metadata-sourceName">Nome da fonte</Label>
                     <Input
                       id="metadata-sourceName"
                       name="sourceName"
@@ -358,7 +358,7 @@ export function MediaLibraryPanel({ items }: MediaLibraryPanelProps) {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="metadata-sourceUrl">Source URL</Label>
+                    <Label htmlFor="metadata-sourceUrl">URL da fonte</Label>
                     <Input
                       id="metadata-sourceUrl"
                       name="sourceUrl"
@@ -368,9 +368,9 @@ export function MediaLibraryPanel({ items }: MediaLibraryPanelProps) {
                   </div>
                 </div>
                 <div className="grid gap-2 text-xs text-muted-foreground">
-                  <p>Public URL: {editingItem.publicUrl}</p>
-                  {editingItem.embedUrl ? <p>Embed URL: {editingItem.embedUrl}</p> : null}
-                  <p>Uploaded by: {editingItem.uploadedByName}</p>
+                  <p>URL publica: {editingItem.publicUrl}</p>
+                  {editingItem.embedUrl ? <p>URL de incorporacao: {editingItem.embedUrl}</p> : null}
+                  <p>Enviado por: {editingItem.uploadedByName}</p>
                 </div>
                 <div className="flex flex-wrap gap-3">
                   <Button type="submit" className="gap-2">

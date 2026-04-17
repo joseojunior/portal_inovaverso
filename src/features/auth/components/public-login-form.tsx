@@ -25,7 +25,7 @@ export function PublicLoginForm() {
       });
 
       if (!result || result.error) {
-        setErrorMessage("Credenciais invalidas ou usuario inativo.");
+        setErrorMessage("Nao foi possivel entrar com esse acesso.");
         return;
       }
 
@@ -38,7 +38,7 @@ export function PublicLoginForm() {
     <Card className="w-full max-w-md border-border/70 bg-card/95 shadow-lg backdrop-blur">
       <CardHeader className="space-y-2">
         <CardTitle className="text-2xl">Entrar para comentar</CardTitle>
-        <CardDescription>Use um `User` ativo do banco para participar da discussao das materias publicadas.</CardDescription>
+        <CardDescription>Use sua conta para participar das conversas nas materias publicadas.</CardDescription>
       </CardHeader>
       <CardContent>
         <form action={handleSubmit} className="space-y-5">

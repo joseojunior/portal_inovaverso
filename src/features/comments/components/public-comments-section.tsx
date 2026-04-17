@@ -24,19 +24,23 @@ export async function PublicCommentsSection({ newsId, newsSlug, commentsEnabled 
       <div className="space-y-2">
         <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#ff8c7a]">Comentarios</p>
         <p className="text-sm text-white/52">
-          Apenas comentarios aprovados aparecem publicamente. Novos envios entram em moderacao.
+          Somente comentarios revisados aparecem publicamente. Novas mensagens passam por moderacao.
         </p>
       </div>
 
       {!commentsEnabled ? (
         <div className="rounded-[1.2rem] border border-dashed border-white/12 px-5 py-4 text-sm text-white/52">
-          Os comentarios estao desativados nesta noticia.
+          Os comentarios estao desativados nesta materia.
         </div>
       ) : currentUser ? (
         <CommentCreateForm newsId={newsId} newsSlug={newsSlug} />
       ) : (
         <div className="rounded-[1.2rem] border border-dashed border-white/12 px-5 py-4 text-sm text-white/52">
-          Para comentar, faça login com um usuario do portal em <Link href="/entrar" className="text-[#52d4ff] hover:text-white">/entrar</Link>.
+          Para comentar, entre na sua conta em{" "}
+          <Link href="/entrar" className="text-[#52d4ff] hover:text-white">
+            /entrar
+          </Link>
+          .
         </div>
       )}
 
@@ -62,7 +66,7 @@ export async function PublicCommentsSection({ newsId, newsSlug, commentsEnabled 
 
       <div className="space-y-4">
         <p className="text-sm font-medium text-white/78">
-          {approvedComments.length > 0 ? `${approvedComments.length} comentarios aprovados` : "Nenhum comentario aprovado ainda"}
+          {approvedComments.length > 0 ? `${approvedComments.length} comentarios publicados` : "Nenhum comentario publicado ainda"}
         </p>
         {approvedComments.length > 0 ? (
           <div className="space-y-4">
@@ -70,9 +74,7 @@ export async function PublicCommentsSection({ newsId, newsSlug, commentsEnabled 
               <article key={comment.id} className="rounded-[1.4rem] border border-white/10 bg-white/5 p-4">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <p className="font-medium text-white">{comment.user.name ?? "Leitor"}</p>
-                  <p className="text-xs uppercase tracking-[0.18em] text-white/36">
-                    {formatShortDate(comment.createdAt)}
-                  </p>
+                  <p className="text-xs uppercase tracking-[0.18em] text-white/36">{formatShortDate(comment.createdAt)}</p>
                 </div>
                 <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-white/72">{comment.content}</p>
               </article>

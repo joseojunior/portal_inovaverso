@@ -4,6 +4,8 @@ import { notFound } from "next/navigation";
 import { PublicNewsArticle } from "@/features/news/components/public-news-article";
 import { getPublicNewsBySlug } from "@/features/news/server/public-home";
 
+export const dynamic = "force-dynamic";
+
 type PublicNewsPageProps = {
   params: Promise<{
     slug: string;

@@ -4,6 +4,8 @@ import { notFound } from "next/navigation";
 import { PublicNewsCollectionPage } from "@/features/news/components/public-news-collection-page";
 import { getPublicAuthorBySlug } from "@/features/news/server/public-home";
 
+export const dynamic = "force-dynamic";
+
 type PublicAuthorPageProps = {
   params: Promise<{
     slug: string;

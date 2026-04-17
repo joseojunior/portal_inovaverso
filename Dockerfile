@@ -1,17 +1,22 @@
-FROM node:20-alpine AS deps
+FROM node:22-alpine AS deps
 WORKDIR /app
 RUN apk add --no-cache libc6-compat openssl
 COPY package.json package-lock.json ./
 RUN npm ci
 
-FROM node:20-alpine AS builder
+FROM node:22-alpine AS builder
 WORKDIR /app
 RUN apk add --no-cache libc6-compat openssl
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV DATABASE_URL=postgresql://postgres:postgres@localhost:5432/portal_inovaverso?schema=public
+ENV DIRECT_URL=postgresql://postgres:postgres@localhost:5432/portal_inovaverso?schema=public
+ENV NEXTAUTH_URL=https://inovaversotv.com.br
+ENV NEXTAUTH_SECRET=build-only-secret-build-only-secret-1234
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npm run build
 
-FROM node:20-alpine AS runner
+FROM node:22-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000
@@ -29,4 +34,3 @@ RUN chmod +x /app/entrypoint.sh
 
 EXPOSE 3000
 ENTRYPOINT ["/app/entrypoint.sh"]
-

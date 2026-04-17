@@ -6,6 +6,8 @@ import { PublicNewsGrid } from "@/features/news/components/public-news-grid";
 import { PublicNewsHero } from "@/features/news/components/public-news-hero";
 import { getPublicHomeNews } from "@/features/news/server/public-home";
 
+export const dynamic = "force-dynamic";
+
 const pillars = [
   {
     title: "Cobertura com ritmo editorial",

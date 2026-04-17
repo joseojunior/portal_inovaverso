@@ -3,6 +3,7 @@ import type { NextAuthConfig } from "next-auth";
 const adminRoles = new Set(["SUPER_ADMIN", "ADMIN", "EDITOR", "MODERATOR"]);
 
 export const authConfig = {
+  trustHost: true,
   providers: [],
   session: {
     strategy: "jwt",

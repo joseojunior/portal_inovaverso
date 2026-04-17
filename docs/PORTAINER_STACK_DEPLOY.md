@@ -15,6 +15,8 @@
    - `DIRECT_URL`
    - `NEXTAUTH_SECRET` (forte, minimo 32 chars)
    - `AI_INGESTION_TOKEN` (forte, minimo 24 chars)
+   - `OPENAI_API_KEY`
+   - `OPENAI_MODEL` (ex: `gpt-4.1-mini`)
    - `SUPABASE_URL`
    - `SUPABASE_SERVICE_ROLE_KEY`
    - `SUPABASE_STORAGE_BUCKET`

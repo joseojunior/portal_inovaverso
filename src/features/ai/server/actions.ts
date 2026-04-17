@@ -8,6 +8,7 @@ import type { AIDraftReviewActionState, AIConfigActionState } from "@/features/a
 import { requireAdminUser } from "@/lib/auth/admin-session";
 import { db } from "@/lib/db";
 import { slugify } from "@/lib/slugify";
+import { runAISearchConfigNow } from "@/lib/ai/run-search-config";
 
 const aiManagerRoles = new Set(["SUPER_ADMIN", "ADMIN"]);
 
@@ -246,6 +247,59 @@ export async function toggleAISearchConfigStatusAction(configId: string, nextIsA
     status: "success" as const,
     message: nextIsActive ? "Configuracao ativada com sucesso." : "Configuracao desativada com sucesso."
   };
+}
+
+export async function runAISearchConfigNowAction(configId: string) {
+  const adminUser = await requireAdminUser();
+
+  if (!ensureAIManager(adminUser.role)) {
+    return {
+      status: "error" as const,
+      message: "Seu perfil nao pode executar jobs de IA."
+    };
+  }
+
+  const config = await db.aISearchConfig.findUnique({
+    where: { id: configId },
+    select: { id: true, isActive: true, name: true }
+  });
+
+  if (!config) {
+    return {
+      status: "error" as const,
+      message: "Configuracao de IA nao encontrada."
+    };
+  }
+
+  if (!config.isActive) {
+    return {
+      status: "error" as const,
+      message: "Ative a configuracao antes de executar um job."
+    };
+  }
+
+  try {
+    const result = await runAISearchConfigNow({
+      configId: config.id,
+      requestedByAdminId: adminUser.id
+    });
+
+    revalidatePath("/admin/ai-configs");
+    revalidatePath("/admin/ai-jobs");
+    revalidatePath("/admin/ai-drafts");
+
+    return {
+      status: "success" as const,
+      message: `Job executado com sucesso. ${result.draftIds.length} draft(s) gerado(s).`
+    };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Falha ao executar job de IA.";
+
+    return {
+      status: "error" as const,
+      message
+    };
+  }
 }
 
 export async function updateAIDraftReviewAction(

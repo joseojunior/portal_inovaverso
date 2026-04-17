@@ -9,6 +9,8 @@
 - `SUPABASE_SERVICE_ROLE_KEY`
 - `SUPABASE_STORAGE_BUCKET`
 - `AI_INGESTION_TOKEN` (minimo 24 caracteres)
+- `OPENAI_API_KEY`
+- `OPENAI_MODEL` (ex: `gpt-4.1-mini`)
 
 ## Validacao rapida local
 1. `npm run build`
@@ -24,7 +26,7 @@
 - `NEXTAUTH_URL` com dominio real (https)
 - `NEXTAUTH_SECRET` forte e unico por ambiente
 - `AI_INGESTION_TOKEN` unico e rotacionavel
+- `OPENAI_API_KEY` com escopo minimo necessario
 - Banco com backup habilitado
 - Bucket de midia com politicas de acesso revisadas
 - Migration aplicada em producao antes do deploy da aplicacao
-

@@ -27,6 +27,11 @@ const storageEnvSchema = z.object({
   SUPABASE_STORAGE_BUCKET: z.string().trim().min(1)
 });
 
+const openAIEnvSchema = z.object({
+  OPENAI_API_KEY: z.string().trim().min(1),
+  OPENAI_MODEL: z.string().trim().min(1).optional()
+});
+
 export type BaseEnv = z.infer<typeof baseEnvSchema>;
 export type AuthEnv = {
   NEXTAUTH_SECRET: string;
@@ -36,11 +41,16 @@ export type AIEnv = {
   AI_INGESTION_TOKEN: string;
 };
 export type StorageEnv = z.infer<typeof storageEnvSchema>;
+export type OpenAIEnv = {
+  OPENAI_API_KEY: string;
+  OPENAI_MODEL: string;
+};
 
 let cachedBaseEnv: BaseEnv | null = null;
 let cachedAuthEnv: AuthEnv | null = null;
 let cachedAIEnv: AIEnv | null = null;
 let cachedStorageEnv: StorageEnv | null = null;
+let cachedOpenAIEnv: OpenAIEnv | null = null;
 
 function parseWithSchema<T extends z.ZodTypeAny>(schema: T, scope: string): z.infer<T> {
   const parsed = schema.safeParse(process.env);
@@ -86,4 +96,14 @@ export function getStorageEnv(): StorageEnv {
   if (cachedStorageEnv) return cachedStorageEnv;
   cachedStorageEnv = parseWithSchema(storageEnvSchema, "storage");
   return cachedStorageEnv;
+}
+
+export function getOpenAIEnv(): OpenAIEnv {
+  if (cachedOpenAIEnv) return cachedOpenAIEnv;
+  const parsed = parseWithSchema(openAIEnvSchema, "openai");
+  cachedOpenAIEnv = {
+    OPENAI_API_KEY: parsed.OPENAI_API_KEY,
+    OPENAI_MODEL: parsed.OPENAI_MODEL ?? "gpt-4.1-mini"
+  };
+  return cachedOpenAIEnv;
 }

@@ -5,6 +5,7 @@ import { Bot, CheckCircle2, PencilLine, Plus, Power, RotateCcw } from "lucide-re
 import { useRouter } from "next/navigation";
 
 import {
+  runAISearchConfigNowAction,
   toggleAISearchConfigStatusAction,
   upsertAISearchConfigAction
 } from "@/features/ai/server/actions";
@@ -104,6 +105,7 @@ export function AISearchConfigsAdminPanel({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formValues, setFormValues] = useState(emptyForm);
   const [toggleMessage, setToggleMessage] = useState<AIConfigActionState | null>(null);
+  const [isRunning, startRunTransition] = useTransition();
 
   const editingConfig = useMemo(() => configs.find((config) => config.id === editingId) ?? null, [configs, editingId]);
   const visibleStates = useMemo(
@@ -198,6 +200,14 @@ export function AISearchConfigsAdminPanel({
     });
   }
 
+  function handleRunNow(configId: string) {
+    startRunTransition(async () => {
+      const result = await runAISearchConfigNowAction(configId);
+      setToggleMessage(result);
+      router.refresh();
+    });
+  }
+
   return (
     <div className="grid gap-6 xl:grid-cols-[minmax(0,1.35fr)_26rem]">
       <div className="space-y-6">
@@ -243,9 +253,19 @@ export function AISearchConfigsAdminPanel({
                     </Button>
                     <Button
                       type="button"
+                      variant="default"
+                      className="gap-2"
+                      disabled={isRunning || !config.isActive}
+                      onClick={() => handleRunNow(config.id)}
+                    >
+                      <Bot className="size-4" />
+                      Executar agora
+                    </Button>
+                    <Button
+                      type="button"
                       variant={config.isActive ? "outline" : "secondary"}
                       className="gap-2"
-                      disabled={isToggling}
+                      disabled={isToggling || isRunning}
                       onClick={() => handleToggle(config.id, !config.isActive)}
                     >
                       <Power className="size-4" />

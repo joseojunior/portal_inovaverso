@@ -60,8 +60,8 @@ export default async function AdminAIConfigsPage() {
           <CardTitle>Escopo desta etapa</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3 text-sm text-muted-foreground">
-          <p>As configuracoes definem contexto editorial e parametros internos, mas ainda nao executam busca externa real.</p>
-          <p>O objetivo agora e deixar a governanca pronta para jobs e drafts com curadoria humana obrigatoria.</p>
+          <p>As configuracoes definem contexto editorial e parametros de coleta em Google News RSS.</p>
+          <p>A execucao manual gera job com draft de IA em estado pendente para curadoria humana obrigatoria.</p>
         </CardContent>
       </Card>
       <AISearchConfigsAdminPanel

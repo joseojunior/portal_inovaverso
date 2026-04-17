@@ -2,14 +2,14 @@ version: "3.9"
 
 services:
   portal_inovaverso_app:
-    image: ${APP_IMAGE}
+    image: ghcr.io/joseojunior/portal_inovaverso:latest
     environment:
       NODE_ENV: production
       PORT: 3000
       RUN_MIGRATIONS: "true"
       DATABASE_URL: ${DATABASE_URL}
       DIRECT_URL: ${DIRECT_URL}
-      NEXTAUTH_URL: ${NEXTAUTH_URL}
+      NEXTAUTH_URL: https://inovaversotv.com.br
       NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
       AI_INGESTION_TOKEN: ${AI_INGESTION_TOKEN}
       SUPABASE_URL: ${SUPABASE_URL}
@@ -19,6 +19,19 @@ services:
       - JunixNet
     deploy:
       replicas: 1
+      restart_policy:
+        condition: any
+        delay: 10s
+        max_attempts: 0
+        window: 60s
+      update_config:
+        order: start-first
+        parallelism: 1
+        delay: 10s
+        failure_action: rollback
+      rollback_config:
+        order: stop-first
+        parallelism: 1
       resources:
         reservations:
           cpus: "0.25"
@@ -43,9 +56,11 @@ services:
       interval: 30s
       timeout: 5s
       retries: 5
-      start_period: 45s
+      start_period: 60s
+    stop_grace_period: 30s
 
 networks:
   JunixNet:
     external: true
     name: JunixNet
+

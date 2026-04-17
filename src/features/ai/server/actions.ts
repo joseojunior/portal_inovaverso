@@ -1,6 +1,6 @@
 "use server";
 
-import { AuditAction, AuditEntityType, AIDraftStatus, NewsStatus } from "@prisma/client";
+import { AuditAction, AuditEntityType, AIDraftStatus, MediaStatus, MediaType, NewsStatus } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
@@ -53,7 +53,8 @@ const convertAIDraftSchema = z.object({
   seoDescription: z.string().trim().max(160, "A SEO description deve ter no maximo 160 caracteres.").optional().or(z.literal("")),
   reviewNotes: z.string().trim().max(1200, "Use ate 1200 caracteres nas observacoes.").optional().or(z.literal("")),
   commentsEnabled: z.boolean(),
-  tagIds: z.array(z.string()).default([])
+  tagIds: z.array(z.string()).default([]),
+  selectedMediaSuggestionIds: z.array(z.string()).default([])
 });
 
 function ensureAIManager(role: "SUPER_ADMIN" | "ADMIN" | "EDITOR" | "MODERATOR") {
@@ -404,7 +405,8 @@ export async function convertAIDraftToNewsAction(
     seoDescription: String(formData.get("seoDescription") ?? ""),
     reviewNotes: String(formData.get("reviewNotes") ?? ""),
     commentsEnabled: formData.get("commentsEnabled") === "on",
-    tagIds: formData.getAll("tagIds").map((value) => String(value))
+    tagIds: formData.getAll("tagIds").map((value) => String(value)),
+    selectedMediaSuggestionIds: formData.getAll("selectedMediaSuggestionIds").map((value) => String(value))
   });
 
   if (!parsed.success) {
@@ -429,7 +431,15 @@ export async function convertAIDraftToNewsAction(
       status: true,
       newsId: true,
       aiJobId: true,
-      sourceUrls: true
+      sourceUrls: true,
+      mediaSuggestions: {
+        select: {
+          id: true,
+          mediaFileId: true,
+          externalUrl: true
+        },
+        orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }]
+      }
     }
   });
 
@@ -446,6 +456,7 @@ export async function convertAIDraftToNewsAction(
   }
 
   const uniqueTagIds = Array.from(new Set(data.tagIds));
+  const selectedSuggestionIds = Array.from(new Set(data.selectedMediaSuggestionIds));
 
   const [category, author, state, city, tags, slugOwner] = await Promise.all([
     db.category.findUnique({ where: { id: data.categoryId }, select: { id: true } }),
@@ -489,6 +500,39 @@ export async function convertAIDraftToNewsAction(
 
   try {
     await db.$transaction(async (tx) => {
+      const selectedSuggestions = draft.mediaSuggestions.filter((suggestion) => selectedSuggestionIds.includes(suggestion.id));
+      const connectedMediaIds: string[] = [];
+
+      for (const suggestion of selectedSuggestions) {
+        if (suggestion.mediaFileId) {
+          connectedMediaIds.push(suggestion.mediaFileId);
+          continue;
+        }
+
+        if (!suggestion.externalUrl) {
+          continue;
+        }
+
+        const createdExternalMedia = await tx.mediaFile.create({
+          data: {
+            uploadedByAdminId: adminUser.id,
+            type: MediaType.IMAGE,
+            status: MediaStatus.PENDING_REVIEW,
+            storageProvider: "external",
+            storageKey: `external/${crypto.randomUUID()}`,
+            url: suggestion.externalUrl,
+            sourceUrl: suggestion.externalUrl,
+            sourceName: "Sugestao IA"
+          },
+          select: { id: true }
+        });
+
+        connectedMediaIds.push(createdExternalMedia.id);
+      }
+
+      const uniqueMediaIds = Array.from(new Set(connectedMediaIds));
+      const featuredMediaId = uniqueMediaIds.length > 0 ? uniqueMediaIds[0] : null;
+
       const news = await tx.news.create({
         data: {
           title: data.title.trim(),
@@ -502,6 +546,7 @@ export async function convertAIDraftToNewsAction(
           countryId: nextCountryId,
           stateId: nextStateId,
           cityId: city?.id ?? null,
+          featuredMediaId,
           seoTitle: normalizeOptional(data.seoTitle),
           seoDescription: normalizeOptional(data.seoDescription),
           commentsEnabled: data.commentsEnabled,
@@ -530,6 +575,16 @@ export async function convertAIDraftToNewsAction(
         });
       }
 
+      if (uniqueMediaIds.length > 0) {
+        await tx.newsMedia.createMany({
+          data: uniqueMediaIds.map((mediaFileId, index) => ({
+            newsId: news.id,
+            mediaFileId,
+            position: index
+          }))
+        });
+      }
+
       await tx.aIDraft.update({
         where: { id: draft.id },
         data: {
@@ -541,6 +596,17 @@ export async function convertAIDraftToNewsAction(
           rejectedByAdminId: null
         }
       });
+
+      if (selectedSuggestions.length > 0) {
+        await tx.aIDraftMediaSuggestion.updateMany({
+          where: { id: { in: selectedSuggestions.map((suggestion) => suggestion.id) } },
+          data: {
+            isSelected: true,
+            selectedByAdminId: adminUser.id,
+            selectedAt: new Date()
+          }
+        });
+      }
 
       await tx.auditLog.createMany({
         data: [
@@ -558,7 +624,14 @@ export async function convertAIDraftToNewsAction(
             entityId: news.id,
             action: AuditAction.CREATE,
             description: "Noticia criada a partir de draft de IA.",
-            metadata: { aiDraftId: draft.id, aiJobId: draft.aiJobId, status: news.status, isAiAssisted: true }
+            metadata: {
+              aiDraftId: draft.id,
+              aiJobId: draft.aiJobId,
+              status: news.status,
+              isAiAssisted: true,
+              featuredMediaId,
+              mediaIds: uniqueMediaIds
+            }
           }
         ]
       });

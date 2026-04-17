@@ -84,6 +84,12 @@ export function AIDraftReviewPanel({ draft, categories, authors, states, cities,
   const [reviewState, reviewAction] = useActionState(updateAIDraftReviewAction, initialAIDraftReviewActionState);
   const [convertState, convertAction] = useActionState(convertAIDraftToNewsAction, initialAIDraftReviewActionState);
   const [isSlugDirty, setIsSlugDirty] = useState(Boolean(draft.suggestedSlug));
+  const [selectedMediaSuggestionIds, setSelectedMediaSuggestionIds] = useState<string[]>(() =>
+    draft.mediaSuggestions
+      .filter((suggestion) => suggestion.isSelected || suggestion.mediaUrl || suggestion.externalUrl)
+      .slice(0, 3)
+      .map((suggestion) => suggestion.id)
+  );
   const [formValues, setFormValues] = useState({
     title: draft.suggestedTitle,
     subtitle: draft.suggestedSubtitle ?? "",
@@ -145,6 +151,12 @@ export function AIDraftReviewPanel({ draft, categories, authors, states, cities,
     }));
   }
 
+  function toggleMediaSuggestion(suggestionId: string) {
+    setSelectedMediaSuggestionIds((current) =>
+      current.includes(suggestionId) ? current.filter((id) => id !== suggestionId) : [...current, suggestionId]
+    );
+  }
+
   return (
     <div className="grid gap-6 xl:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
       <div className="space-y-6">
@@ -203,6 +215,23 @@ export function AIDraftReviewPanel({ draft, categories, authors, states, cities,
                 <div className="grid gap-3">
                   {draft.mediaSuggestions.map((suggestion) => (
                     <div key={suggestion.id} className="rounded-2xl border border-border/70 bg-background/70 p-4 text-sm text-muted-foreground">
+                      <label className="mb-3 flex items-center gap-2 rounded-lg border border-border/70 bg-card/80 px-3 py-2 text-xs font-medium uppercase tracking-[0.12em] text-foreground">
+                        <input
+                          type="checkbox"
+                          checked={selectedMediaSuggestionIds.includes(suggestion.id)}
+                          onChange={() => toggleMediaSuggestion(suggestion.id)}
+                          className="size-4 rounded border-border"
+                        />
+                        Usar na noticia convertida
+                      </label>
+                      {suggestion.mediaUrl || suggestion.externalUrl ? (
+                        <img
+                          src={suggestion.mediaUrl ?? suggestion.externalUrl ?? ""}
+                          alt={suggestion.mediaCaption ?? "Sugestao de midia da IA"}
+                          className="mb-3 h-44 w-full rounded-xl border border-border/70 object-cover"
+                          loading="lazy"
+                        />
+                      ) : null}
                       <div className="flex flex-wrap items-center gap-2">
                         {suggestion.mediaFileId ? <Badge variant="accent">Midia interna</Badge> : <Badge variant="outline">Link externo</Badge>}
                         {suggestion.confidenceScore ? <Badge variant="outline">Confianca {suggestion.confidenceScore}</Badge> : null}
@@ -282,6 +311,9 @@ export function AIDraftReviewPanel({ draft, categories, authors, states, cities,
           <form action={convertAction} className="space-y-5">
             <input type="hidden" name="aiDraftId" value={draft.id} />
             {formValues.tagIds.map((tagId) => <input key={tagId} type="hidden" name="tagIds" value={tagId} />)}
+            {selectedMediaSuggestionIds.map((suggestionId) => (
+              <input key={suggestionId} type="hidden" name="selectedMediaSuggestionIds" value={suggestionId} />
+            ))}
             <div className="space-y-2">
               <Label htmlFor="title">Titulo</Label>
               <Input id="title" name="title" value={formValues.title} onChange={(event) => handleFieldChange("title", event.target.value)} required />

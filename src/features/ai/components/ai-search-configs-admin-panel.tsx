@@ -290,7 +290,7 @@ export function AISearchConfigsAdminPanel({
           <div className="flex items-center justify-between gap-3">
             <div>
               <CardTitle>{editingConfig ? "Editar configuracao" : "Nova configuracao"}</CardTitle>
-              <CardDescription>Base editorial para futuras rotinas de IA, sem integrar busca externa nesta etapa.</CardDescription>
+              <CardDescription>Defina os parametros usados na coleta de fontes e geracao automatica de drafts com curadoria humana.</CardDescription>
             </div>
             <Button type="button" variant="ghost" size="icon" onClick={resetForm}>
               <Plus className="size-4" />

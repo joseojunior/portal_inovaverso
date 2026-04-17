@@ -1,5 +1,6 @@
 import { AuditAction, AuditEntityType } from "@prisma/client";
 
+import { extractArticleMediaCandidate } from "@/lib/ai/extract-article-media";
 import { collectGoogleNewsRss } from "@/lib/ai/google-news-rss";
 import { generateDraftWithOpenAI } from "@/lib/ai/openai-draft";
 import { persistExternalCollection } from "@/lib/ai/persist";
@@ -54,6 +55,34 @@ export async function runAISearchConfigNow(input: {
     throw new Error("Nenhuma fonte encontrada para a configuracao.");
   }
 
+  const extractedMedia = await Promise.all(
+    collected.items.map(async (item, index) => {
+      const candidate = await extractArticleMediaCandidate(item.url);
+
+      if (!candidate?.imageUrl) {
+        return null;
+      }
+
+      return {
+        externalUrl: candidate.imageUrl,
+        reason: `Imagem sugerida a partir da fonte ${index + 1}${item.sourceName ? ` (${item.sourceName})` : ""}.`,
+        confidenceScore: 70,
+        sortOrder: index
+      };
+    })
+  );
+
+  const uniqueMediaByUrl = new Map<string, { externalUrl: string; reason: string; confidenceScore: number; sortOrder: number }>();
+
+  for (const media of extractedMedia) {
+    if (!media) continue;
+    if (!uniqueMediaByUrl.has(media.externalUrl)) {
+      uniqueMediaByUrl.set(media.externalUrl, media);
+    }
+  }
+
+  const mediaSuggestions = Array.from(uniqueMediaByUrl.values()).slice(0, 6);
+
   const { draft, model } = await generateDraftWithOpenAI({
     query: collected.query,
     languageCode: config.languageCode,
@@ -73,7 +102,12 @@ export async function runAISearchConfigNow(input: {
     promptVersion: model,
     requestedByAdminId: input.requestedByAdminId,
     externalJobId,
-    drafts: [draft],
+    drafts: [
+      {
+        ...draft,
+        mediaSuggestions
+      }
+    ],
     rawPayload: {
       configName: config.name,
       query: collected.query,
@@ -105,4 +139,3 @@ export async function runAISearchConfigNow(input: {
 export function buildSuggestedNewsSlug(title: string) {
   return slugify(title);
 }
-

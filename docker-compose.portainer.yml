@@ -7,6 +7,10 @@ services:
       NODE_ENV: production
       PORT: 3000
       RUN_MIGRATIONS: "true"
+      RUN_ADMIN_BOOTSTRAP: "${RUN_ADMIN_BOOTSTRAP:-false}"
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      ADMIN_NAME: ${ADMIN_NAME:-Administrador Inovaverso}
       DATABASE_URL: ${DATABASE_URL}
       DIRECT_URL: ${DIRECT_URL}
       NEXTAUTH_URL: https://inovaversotv.com.br

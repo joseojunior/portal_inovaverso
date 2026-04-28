@@ -6,6 +6,11 @@ if [ "${RUN_MIGRATIONS:-false}" = "true" ]; then
   npx prisma migrate deploy
 fi
 
+if [ "${RUN_ADMIN_BOOTSTRAP:-false}" = "true" ]; then
+  echo "[entrypoint] Garantindo conta admin bootstrap..."
+  node /app/docker/bootstrap-admin.mjs
+fi
+
 echo "[entrypoint] Iniciando aplicacao..."
 
 APP_ROOT="/app"

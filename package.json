@@ -11,7 +11,9 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate:dev": "prisma migrate dev",
     "prisma:studio": "prisma studio",
-    "prisma:seed": "tsx -r dotenv/config prisma/seed.ts"
+    "prisma:seed": "tsx -r dotenv/config prisma/seed.ts",
+    "admin:create": "tsx -r dotenv/config scripts/create-admin-user.ts",
+    "admin:verify": "tsx -r dotenv/config scripts/verify-admin-login.ts"
   },
   "prisma": {
     "seed": "tsx -r dotenv/config prisma/seed.ts"
